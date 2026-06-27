@@ -2,7 +2,7 @@
 import unittest
 from pathlib import Path
 
-from mcp_audit.audit import audit_config, extract_servers, find_secrets
+from mcp_audit.audit import audit_config, audit_server, extract_servers, find_secrets
 
 EX = Path(__file__).resolve().parent.parent / "examples"
 
@@ -52,6 +52,11 @@ class TestAudit(unittest.TestCase):
     def test_token_estimate_positive(self):
         res = audit_config(EX / "insecure.mcp.json")
         self.assertGreater(res.est_tokens, 0)
+
+    def test_deprecated_sse(self):
+        ids = {f.id for f in audit_server("x", {"type": "sse", "url": "https://x",
+                                               "headers": {"Authorization": "Bearer y"}})}
+        self.assertIn("deprecated-sse", ids)
 
 
 if __name__ == "__main__":

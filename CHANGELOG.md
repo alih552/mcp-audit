@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+- New check: **deprecated SSE transport** (recommend migrating to Streamable HTTP).
+- New check: **secrets in a world/group-readable config file** (local-exposure risk; suggests `chmod 600`).
+
 ## 0.1.0
 First release. Static security + token-bloat audit for MCP configs:
 - Detects: remote servers with no auth, cleartext `http://`, plaintext secrets, unpinned

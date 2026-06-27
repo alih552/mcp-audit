@@ -11,6 +11,7 @@ Pure standard library — no dependencies, no network calls. Safe to run anywher
 from __future__ import annotations
 
 import json
+import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -149,6 +150,12 @@ def audit_server(name: str, srv: dict) -> list:
                 "It silently executes whatever the latest published package is — a supply-chain risk.",
                 "Pin an exact version (e.g. package@1.2.3) and review updates before adopting them."))
 
+    if srv.get("type") == "sse":
+        findings.append(Finding(
+            "deprecated-sse", "LOW", name, "Deprecated SSE transport",
+            f"'{name}' uses the SSE transport, which is deprecated in MCP in favor of Streamable HTTP.",
+            'Migrate to the Streamable HTTP transport (type: "http").'))
+
     if SHELLY.search(name) or SHELLY.search(cmd):
         findings.append(Finding(
             "shell-exec", "MEDIUM", name, "Shell/exec-capable server",
@@ -176,7 +183,8 @@ def estimate_tokens(servers: dict, tools_count: int | None) -> int:
 
 
 def audit_config(path: Path, tools_count: int | None = None) -> AuditResult:
-    data = json.loads(Path(path).read_text())
+    raw_text = Path(path).read_text()
+    data = json.loads(raw_text)
     servers = extract_servers(data)
     res = AuditResult(source=str(path), servers=len(servers))
     if not servers:
@@ -188,6 +196,17 @@ def audit_config(path: Path, tools_count: int | None = None) -> AuditResult:
     for name, srv in servers.items():
         if isinstance(srv, dict):
             res.findings.extend(audit_server(name, srv))
+
+    # File-level: secrets sitting in a world/group-readable config file
+    try:
+        if (os.stat(path).st_mode & 0o077) and find_secrets(raw_text):
+            res.findings.append(Finding(
+                "world-readable-config", "HIGH", "*", "Secrets in a world/group-readable config file",
+                f"{path} is readable by other users on this machine and contains a secret — any local "
+                "user or compromised process can read it.",
+                "chmod 600 the config file, and prefer env vars / a secret manager over inlined secrets."))
+    except OSError:
+        pass
 
     res.est_tokens = estimate_tokens(servers, tools_count)
     # Token-bloat heuristics
