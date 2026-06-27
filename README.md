@@ -80,11 +80,14 @@ and `mcp.servers`), Windsurf, and any `{ "mcpServers": { … } }` / `{ "servers"
 
 ---
 
+<a id="mcp-forge-kit"></a>
 ### Going further — MCP Forge Kit
-`mcp-audit` finds the problems. **[MCP Forge Kit](https://polar.sh/mcp-forge)** fixes them: a
-production-grade, **secure-by-default MCP server starter** — OAuth, rate limiting, SSRF-safe outbound
-fetch, input validation, token-lean tool schemas, tests, CI, and Cloudflare/Vercel deploy configs,
-with a security checklist and setup guide. Ship a server that scores **A** from day one.
+`mcp-audit` finds the problems. **MCP Forge Kit** fixes them: a production-grade, **secure-by-default
+MCP server starter** — bearer + JWT auth, rate limiting, SSRF-safe outbound fetch, input validation,
+token-lean tool schemas, 21 tests, CI, and Docker/Node deploy configs, with a security checklist and
+setup guide. Ship a server that scores **A** from day one.
+
+> 🚀 **Launching on Polar shortly — ⭐ star/watch this repo for the link.**
 
 ## License
 MIT.

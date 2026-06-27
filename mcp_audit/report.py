@@ -23,7 +23,7 @@ def _cta(paint) -> str:
     return ("\n" + paint("─" * 64, DIM) +
             "\n🛠  Fix all of this the right way — secure-by-default MCP server templates"
             "\n   (OAuth, rate limiting, SSRF-safe fetch, token-lean tools, tests, CI):"
-            "\n   " + paint("MCP Forge Kit → https://polar.sh/mcp-forge", BOLD) + "\n")
+            "\n   " + paint("MCP Forge Kit → https://github.com/alih552/mcp-audit#mcp-forge-kit", BOLD) + "\n")
 
 
 def to_text(res: AuditResult, color: bool = True, cta: bool = True) -> str:
