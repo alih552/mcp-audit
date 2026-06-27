@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "internal-api": {
+      "type": "http",
+      "url": "http://api.internal.example.com/mcp"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "ghp_AbCdEf0123456789AbCdEf0123456789AbCd" }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users"]
+    },
+    "shell-runner": {
+      "command": "uvx",
+      "args": ["mcp-shell-server"]
+    },
+    "web-search": {
+      "command": "npx",
+      "args": ["-y", "search-mcp"]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "brave-search-mcp"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}

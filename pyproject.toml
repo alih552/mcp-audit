@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-audit"
+version = "0.1.0"
+description = "Find security holes and token bloat in your MCP server configs. Zero dependencies."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = ["mcp", "model-context-protocol", "security", "audit", "claude", "llm", "tokens"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/REPLACE_ME/mcp-audit"
+
+[project.scripts]
+mcp-audit = "mcp_audit.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_audit"]

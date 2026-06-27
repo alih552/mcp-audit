@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://mcp.github.example.com",
+      "headers": { "Authorization": "Bearer ${GITHUB_MCP_TOKEN}" }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem@1.4.2", "./project-workspace"]
+    }
+  }
+}

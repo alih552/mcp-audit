@@ -1,0 +1,17 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run tests (zero dependencies)
+        run: python -m unittest discover -s tests -v
+      - name: Self-audit the clean example must score A
+        run: python -m mcp_audit examples/good.mcp.json --min-score 90 --no-color --no-cta
