@@ -1,5 +1,7 @@
 # mcp-audit
 
+[![MCP security: mcp-audit](https://img.shields.io/badge/MCP_security-mcp--audit-5ee0c0)](https://github.com/alih552/mcp-audit) [![Scan your config](https://img.shields.io/badge/MCP_config-scan_yours-7c8cff)](https://alih552.github.io/mcp-forge/scan.html)
+
 **Find security holes and token bloat in your MCP servers, in one command, zero dependencies.**
 
 The MCP ecosystem exploded in 2026, and most of it is dangerously misconfigured. A 2026 analysis of
@@ -98,6 +100,20 @@ and `mcp.servers`), Windsurf, and any `{ "mcpServers": { … } }` / `{ "servers"
 ---
 
 <a id="mcp-forge-kit"></a>
+
+## Add the badge
+
+Audited your MCP setup? Show it. Paste into your README:
+
+```
+[![MCP security: mcp-audit](https://img.shields.io/badge/MCP_security-mcp--audit-5ee0c0)](https://github.com/alih552/mcp-audit)
+```
+
+Or link the free scanner so others can check their own:
+
+```
+[![Scan your MCP config](https://img.shields.io/badge/MCP_config-scan_yours-7c8cff)](https://alih552.github.io/mcp-forge/scan.html)
+```
 
 ## Going further: MCP Forge Kit
 `mcp-audit` finds the problems. **MCP Forge Kit** fixes them: a production-grade, **secure-by-default
