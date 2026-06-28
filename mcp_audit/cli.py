@@ -55,6 +55,7 @@ def main(argv=None) -> int:
     p.add_argument("--tools", help="a tool-list JSON export for accurate token estimates")
     p.add_argument("--no-color", action="store_true")
     p.add_argument("--no-cta", action="store_true", help="hide the upsell line")
+    p.add_argument("--by-risk", action="store_true", help="group findings by risk class instead of severity")
     p.add_argument("--min-score", type=int, default=None,
                    help="exit non-zero if any config scores below this (for CI)")
     args = p.parse_args(argv)
@@ -82,7 +83,7 @@ def main(argv=None) -> int:
         print(json.dumps([json.loads(to_json(r)) for r in results], indent=2))
     else:
         for r in results:
-            print(to_text(r, color=not args.no_color, cta=not args.no_cta))
+            print(to_text(r, color=not args.no_color, cta=not args.no_cta, by_risk=args.by_risk))
 
     if args.min_score is not None and any(r.score < args.min_score for r in results):
         return 1

@@ -60,6 +60,7 @@ mcp-audit                          # auto-detect common configs on this machine
 mcp-audit .mcp.json other.json     # audit specific files
 mcp-audit --json                   # machine-readable output (for tooling)
 mcp-audit --tools tools.json       # include a tool-list export for an accurate token estimate
+mcp-audit --by-risk                # group findings by risk class (auth, secrets, code exec, etc.)
 mcp-audit --min-score 80           # exit non-zero below the threshold — drop it into CI
 ```
 

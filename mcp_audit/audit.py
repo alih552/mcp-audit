@@ -20,6 +20,30 @@ from urllib.parse import urlparse
 SEVERITIES = ["HIGH", "MEDIUM", "LOW", "INFO"]
 SEV_PENALTY = {"HIGH": 25, "MEDIUM": 10, "LOW": 4, "INFO": 0}
 
+# Group findings by the kind of risk, not just severity. A score is the hook; the
+# risk class plus the per-finding fix is the remediation path.
+RISK_CLASS = {
+    "remote-no-auth": "Authentication",
+    "credentials-in-url": "Credentials & secrets",
+    "plaintext-secret": "Credentials & secrets",
+    "world-readable-config": "Credentials & secrets",
+    "cleartext-http": "Network exposure",
+    "deprecated-sse": "Network exposure",
+    "unpinned-exec": "Code execution & supply chain",
+    "inline-code-exec": "Code execution & supply chain",
+    "shell-exec": "Code execution & supply chain",
+    "broad-filesystem": "Over-broad access",
+    "server-bloat": "Context cost",
+    "redundant-servers": "Context cost",
+    "no-servers": "Info",
+}
+RISK_ORDER = ["Authentication", "Credentials & secrets", "Network exposure",
+              "Code execution & supply chain", "Over-broad access", "Context cost", "Other", "Info"]
+
+
+def risk_class(finding_id: str) -> str:
+    return RISK_CLASS.get(finding_id, "Other")
+
 # Rough heuristic: each exposed tool's JSON schema costs the model context window.
 TOKENS_PER_TOOL = 220          # conservative average for a real-world tool schema
 TOKENS_PER_SERVER_BASE = 120   # per-server framing overhead
@@ -75,6 +99,15 @@ class AuditResult:
         for f in self.findings:
             c[f.severity] += 1
         return c
+
+    def by_risk(self):
+        """Return [(risk_class, [findings])] in a sensible order."""
+        groups: dict = {}
+        for f in self.findings:
+            groups.setdefault(risk_class(f.id), []).append(f)
+        ordered = [(c, groups[c]) for c in RISK_ORDER if c in groups]
+        extra = [(c, fs) for c, fs in groups.items() if c not in RISK_ORDER]
+        return ordered + extra
 
 
 def extract_servers(data: dict) -> dict:

@@ -66,6 +66,15 @@ class TestAudit(unittest.TestCase):
         ids = {f.id for f in audit_server("x", {"command": "python3", "args": ["-c", "print(1)"]})}
         self.assertIn("inline-code-exec", ids)
 
+    def test_risk_class_grouping(self):
+        from mcp_audit.audit import risk_class
+        self.assertEqual(risk_class("remote-no-auth"), "Authentication")
+        self.assertEqual(risk_class("plaintext-secret"), "Credentials & secrets")
+        res = audit_config(EX / "insecure.mcp.json")
+        classes = {c for c, _ in res.by_risk()}
+        self.assertIn("Authentication", classes)
+        self.assertIn("Code execution & supply chain", classes)
+
 
 if __name__ == "__main__":
     unittest.main()

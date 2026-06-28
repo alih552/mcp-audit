@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+- New `--by-risk` flag: groups findings by risk class (Authentication, Credentials & secrets, Network
+  exposure, Code execution & supply chain, Over-broad access, Context cost) instead of severity. The
+  JSON output now includes a `risk_class` on every finding too.
+
 ## 0.1.2
 - New check: **credentials embedded in a server URL** (https://user:pass@host).
 - New check: **inline code execution** (running code via `python -c`, `node -e`, etc. from the config).
