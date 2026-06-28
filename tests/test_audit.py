@@ -58,6 +58,14 @@ class TestAudit(unittest.TestCase):
                                                "headers": {"Authorization": "Bearer y"}})}
         self.assertIn("deprecated-sse", ids)
 
+    def test_credentials_in_url(self):
+        ids = {f.id for f in audit_server("x", {"type": "http", "url": "https://user:pass@example.com"})}
+        self.assertIn("credentials-in-url", ids)
+
+    def test_inline_code_exec(self):
+        ids = {f.id for f in audit_server("x", {"command": "python3", "args": ["-c", "print(1)"]})}
+        self.assertIn("inline-code-exec", ids)
+
 
 if __name__ == "__main__":
     unittest.main()

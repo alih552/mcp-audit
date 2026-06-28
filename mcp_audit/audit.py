@@ -15,6 +15,7 @@ import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlparse
 
 SEVERITIES = ["HIGH", "MEDIUM", "LOW", "INFO"]
 SEV_PENALTY = {"HIGH": 25, "MEDIUM": 10, "LOW": 4, "INFO": 0}
@@ -38,6 +39,7 @@ SECRET_PATTERNS = [
 ENV_SECRET_HINT = re.compile(r"(?i)(token|secret|api[_-]?key|password|passwd|access[_-]?key|private)")
 AUTH_HEADER_HINT = re.compile(r"(?i)(authorization|x-api-key|api-key|token|bearer)")
 UNPINNED_RUNNERS = {"npx", "uvx", "bunx", "pnpm", "dlx"}
+INTERPRETERS = {"python", "python3", "node", "ruby", "bash", "sh", "zsh", "deno", "bun", "perl"}
 BROAD_FS_ROOTS = {"/", "~", "$HOME", "/Users", "/home", "C:\\", "/etc", "/var"}
 SHELLY = re.compile(r"(?i)(shell|exec|command|terminal|bash|subprocess|run[_-]?command)")
 
@@ -131,6 +133,15 @@ def audit_server(name: str, srv: dict) -> list:
                 "cleartext-http", "HIGH", name, "Cleartext HTTP (no TLS)",
                 f"'{name}' uses http:// — traffic and tokens are sent unencrypted and the endpoint is SSRF/MITM-prone.",
                 "Use https:// with a valid certificate; never send tokens over plaintext http."))
+        try:
+            if urlparse(url).username:
+                findings.append(Finding(
+                    "credentials-in-url", "HIGH", name, "Credentials embedded in the server URL",
+                    f"'{name}' has a username or password inside its URL. Credentials in a URL leak through "
+                    "logs, shell history, and proxies.",
+                    "Move credentials to an Authorization header or an env var, never the URL."))
+        except ValueError:
+            pass
 
     for label, sample in find_secrets(blob):
         findings.append(Finding(
@@ -161,6 +172,13 @@ def audit_server(name: str, srv: dict) -> list:
             "shell-exec", "MEDIUM", name, "Shell/exec-capable server",
             f"'{name}' looks able to run shell commands. That's a large blast radius if the model is prompt-injected.",
             "Restrict to an allowlist of commands, run sandboxed, and require confirmation for destructive actions."))
+
+    if Path(cmd).name in INTERPRETERS and any(a in ("-c", "-e", "--eval", "--exec") for a in args):
+        findings.append(Finding(
+            "inline-code-exec", "MEDIUM", name, "Runs inline code from the config",
+            f"'{name}' runs inline code via {Path(cmd).name} with -c or -e. Inline code in a config is hard to "
+            "review and easy to tamper with.",
+            "Move the logic into a versioned, reviewed package or script instead of inlining it."))
 
     for a in args + list((srv.get("env") or {}).values()):
         a = str(a)
