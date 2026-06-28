@@ -11,7 +11,7 @@ request — five servers commonly burn **50–75k tokens of context before you t
 and tells you exactly what's wrong and how to fix it.
 
 ```bash
-pipx install mcp-audit      # or: pip install mcp-audit
+pipx install git+https://github.com/alih552/mcp-audit   # PyPI release coming soon
 mcp-audit                    # auto-detects your MCP configs
 ```
 
@@ -67,7 +67,7 @@ Exit codes: `0` ok · `1` below `--min-score` · `2` no config found / unreadabl
 
 ### In CI (GitHub Actions)
 ```yaml
-- run: pipx install mcp-audit && mcp-audit .mcp.json --min-score 80 --no-color
+- run: pipx install git+https://github.com/alih552/mcp-audit && mcp-audit .mcp.json --min-score 80 --no-color
 ```
 
 ## Privacy
