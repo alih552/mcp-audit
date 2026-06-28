@@ -78,6 +78,15 @@ Use the action:
 ```
 Or run it directly: `pipx install git+https://github.com/alih552/mcp-audit && mcp-audit .mcp.json --min-score 80`
 
+For GitHub code scanning, emit SARIF and upload it:
+```yaml
+- run: pipx install git+https://github.com/alih552/mcp-audit
+- run: mcp-audit --sarif > mcp-audit.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: mcp-audit.sarif
+```
+
 ## Privacy
 100% local and offline. It never connects to your servers and never sends your config anywhere.
 No dependencies, no telemetry. Read the ~300 lines of source yourself.
@@ -89,7 +98,8 @@ and `mcp.servers`), Windsurf, and any `{ "mcpServers": { … } }` / `{ "servers"
 ---
 
 <a id="mcp-forge-kit"></a>
-### Going further: MCP Forge Kit
+
+## Going further: MCP Forge Kit
 `mcp-audit` finds the problems. **MCP Forge Kit** fixes them: a production-grade, **secure-by-default
 MCP server starter** with bearer and JWT auth, rate limiting, SSRF-safe outbound fetch, input validation,
 token-lean tool schemas, 21 tests, CI, and Docker/Node deploy configs, with a security checklist and

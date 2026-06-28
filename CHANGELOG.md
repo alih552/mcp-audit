@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.5
+- New `--sarif` output (SARIF 2.1.0) so mcp-audit drops straight into GitHub code scanning and CI.
+
 ## 0.1.4
 - Three new checks: `tls-verify-disabled` (HIGH, catches NODE_TLS_REJECT_UNAUTHORIZED=0 and friends),
   `bind-all-interfaces` (MEDIUM, a server listening on 0.0.0.0), and `privileged-runner` (MEDIUM, sudo or

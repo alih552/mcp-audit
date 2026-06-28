@@ -1,4 +1,4 @@
-"""mcp-audit — find security holes & token bloat in your MCP servers.
+"""mcp-audit: find security holes and token bloat in your MCP servers.
 
   mcp-audit                      # auto-detect common MCP configs on this machine
   mcp-audit path/to/.mcp.json    # audit a specific config
@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from .audit import audit_config
-from .report import to_json, to_text
+from .report import to_json, to_sarif, to_text
 
 DEFAULT_LOCATIONS = [
     "~/Library/Application Support/Claude/claude_desktop_config.json",  # Claude Desktop (macOS)
@@ -56,6 +56,7 @@ def main(argv=None) -> int:
     p.add_argument("--no-color", action="store_true")
     p.add_argument("--no-cta", action="store_true", help="hide the upsell line")
     p.add_argument("--by-risk", action="store_true", help="group findings by risk class instead of severity")
+    p.add_argument("--sarif", action="store_true", help="output SARIF 2.1.0 for GitHub code scanning / CI")
     p.add_argument("--min-score", type=int, default=None,
                    help="exit non-zero if any config scores below this (for CI)")
     args = p.parse_args(argv)
@@ -74,12 +75,18 @@ def main(argv=None) -> int:
         try:
             results.append(audit_config(path, tools_count))
         except json.JSONDecodeError as e:
-            print(f"skip (invalid JSON): {path} — {e}", file=sys.stderr)
+            print(f"skip (invalid JSON): {path}: {e}", file=sys.stderr)
 
     if not results:
         return 2
 
-    if args.json:
+    if args.sarif:
+        docs = [json.loads(to_sarif(r)) for r in results]
+        merged = docs[0]
+        for d in docs[1:]:
+            merged["runs"].extend(d["runs"])
+        print(json.dumps(merged, indent=2))
+    elif args.json:
         print(json.dumps([json.loads(to_json(r)) for r in results], indent=2))
     else:
         for r in results:

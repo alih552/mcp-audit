@@ -88,5 +88,14 @@ class TestAudit(unittest.TestCase):
         self.assertIn("privileged-runner", ids)
 
 
+    def test_sarif_output(self):
+        from mcp_audit.report import to_sarif
+        import json as _json
+        res = audit_config(EX / "insecure.mcp.json")
+        doc = _json.loads(to_sarif(res))
+        self.assertEqual(doc["version"], "2.1.0")
+        self.assertTrue(doc["runs"][0]["results"])
+        self.assertEqual(doc["runs"][0]["tool"]["driver"]["name"], "mcp-audit")
+
 if __name__ == "__main__":
     unittest.main()

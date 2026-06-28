@@ -19,9 +19,48 @@ def to_json(res: AuditResult) -> str:
     }, indent=2)
 
 
+SARIF_LEVEL = {"HIGH": "error", "MEDIUM": "warning", "LOW": "note", "INFO": "note"}
+
+
+def to_sarif(res: AuditResult) -> str:
+    """Emit SARIF 2.1.0 so the report drops into GitHub code scanning and CI."""
+    from . import __version__
+    rules, seen = [], set()
+    for f in res.findings:
+        if f.id in seen:
+            continue
+        seen.add(f.id)
+        rules.append({
+            "id": f.id,
+            "name": f.title,
+            "shortDescription": {"text": f.title},
+            "helpUri": "https://github.com/alih552/mcp-audit",
+            "properties": {"riskClass": risk_class(f.id)},
+        })
+    results = [{
+        "ruleId": f.id,
+        "level": SARIF_LEVEL.get(f.severity, "note"),
+        "message": {"text": f"{f.title} ({f.server}). {f.detail} Fix: {f.fix}"},
+        "locations": [{"physicalLocation": {"artifactLocation": {"uri": res.source}}}],
+    } for f in res.findings]
+    return json.dumps({
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [{
+            "tool": {"driver": {
+                "name": "mcp-audit",
+                "version": __version__,
+                "informationUri": "https://github.com/alih552/mcp-audit",
+                "rules": rules,
+            }},
+            "results": results,
+        }],
+    }, indent=2)
+
+
 def _cta(paint) -> str:
     return ("\n" + paint("─" * 64, DIM) +
-            "\n🛠  Fix all of this the right way — secure-by-default MCP server templates"
+            "\n🛠  Fix all of this the right way with secure-by-default MCP server templates"
             "\n   (OAuth, rate limiting, SSRF-safe fetch, token-lean tools, tests, CI):"
             "\n   " + paint("MCP Forge Kit → https://alih552.github.io/mcp-forge/", BOLD) + "\n")
 
