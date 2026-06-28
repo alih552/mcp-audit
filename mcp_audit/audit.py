@@ -6,7 +6,7 @@ no auth on remote servers, cleartext http, secrets pasted in plaintext, unpinned
 auto-updating executables, over-broad filesystem/shell access, and context/token
 bloat from too many servers and tools.
 
-Pure standard library — no dependencies, no network calls. Safe to run anywhere.
+Pure standard library, no dependencies, no network calls. Safe to run anywhere.
 """
 from __future__ import annotations
 
@@ -167,7 +167,7 @@ def audit_server(name: str, srv: dict) -> list:
         if url.startswith("http://"):
             findings.append(Finding(
                 "cleartext-http", "HIGH", name, "Cleartext HTTP (no TLS)",
-                f"'{name}' uses http:// — traffic and tokens are sent unencrypted and the endpoint is SSRF/MITM-prone.",
+                f"'{name}' uses http://, so traffic and tokens are sent unencrypted and the endpoint is SSRF/MITM-prone.",
                 "Use https:// with a valid certificate; never send tokens over plaintext http."))
         try:
             if urlparse(url).username:
@@ -194,7 +194,7 @@ def audit_server(name: str, srv: dict) -> list:
             findings.append(Finding(
                 "unpinned-exec", "MEDIUM", name, "Unpinned auto-updating executable",
                 f"'{name}' runs via {runner} without a pinned version (-y/@latest/no @version). "
-                "It silently executes whatever the latest published package is — a supply-chain risk.",
+                "It silently executes whatever the latest published package is, a supply-chain risk.",
                 "Pin an exact version (e.g. package@1.2.3) and review updates before adopting them."))
 
     if srv.get("type") == "sse":
@@ -284,7 +284,7 @@ def audit_config(path: Path, tools_count: int | None = None) -> AuditResult:
         if (os.stat(path).st_mode & 0o077) and find_secrets(raw_text):
             res.findings.append(Finding(
                 "world-readable-config", "HIGH", "*", "Secrets in a world/group-readable config file",
-                f"{path} is readable by other users on this machine and contains a secret — any local "
+                f"{path} is readable by other users on this machine and contains a secret, so any local "
                 "user or compromised process can read it.",
                 "chmod 600 the config file, and prefer env vars / a secret manager over inlined secrets."))
     except OSError:
