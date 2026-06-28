@@ -1,0 +1,26 @@
+name: "MCP Audit"
+description: "Find security holes and token bloat in your MCP server configs. Fail CI on low scores."
+author: "alih552"
+branding:
+  icon: "shield"
+  color: "purple"
+inputs:
+  path:
+    description: "Path(s) to MCP config file(s). Omit to auto-detect."
+    required: false
+    default: ""
+  min-score:
+    description: "Fail the job if any config scores below this (0-100)."
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        python3 -m pip install --quiet "git+https://github.com/alih552/mcp-audit"
+        args="--no-color"
+        if [ -n "${{ inputs.path }}" ]; then args="$args ${{ inputs.path }}"; fi
+        if [ -n "${{ inputs.min-score }}" ]; then args="$args --min-score ${{ inputs.min-score }}"; fi
+        echo "Running: mcp-audit $args"
+        mcp-audit $args

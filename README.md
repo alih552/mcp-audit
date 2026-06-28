@@ -66,9 +66,14 @@ mcp-audit --min-score 80           # exit non-zero below the threshold — drop 
 Exit codes: `0` ok · `1` below `--min-score` · `2` no config found / unreadable.
 
 ### In CI (GitHub Actions)
+Use the action:
 ```yaml
-- run: pipx install git+https://github.com/alih552/mcp-audit && mcp-audit .mcp.json --min-score 80 --no-color
+- uses: alih552/mcp-audit@v0.1.1
+  with:
+    path: .mcp.json
+    min-score: "80"   # fail the job below this score
 ```
+Or run it directly: `pipx install git+https://github.com/alih552/mcp-audit && mcp-audit .mcp.json --min-score 80`
 
 ## Privacy
 100% local and offline. It never connects to your servers and never sends your config anywhere.
