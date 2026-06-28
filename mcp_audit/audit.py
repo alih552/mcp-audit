@@ -29,9 +29,12 @@ RISK_CLASS = {
     "world-readable-config": "Credentials & secrets",
     "cleartext-http": "Network exposure",
     "deprecated-sse": "Network exposure",
+    "tls-verify-disabled": "Network exposure",
+    "bind-all-interfaces": "Network exposure",
     "unpinned-exec": "Code execution & supply chain",
     "inline-code-exec": "Code execution & supply chain",
     "shell-exec": "Code execution & supply chain",
+    "privileged-runner": "Code execution & supply chain",
     "broad-filesystem": "Over-broad access",
     "server-bloat": "Context cost",
     "redundant-servers": "Context cost",
@@ -159,7 +162,7 @@ def audit_server(name: str, srv: dict) -> list:
             findings.append(Finding(
                 "remote-no-auth", "HIGH", name, "Remote server with no authentication",
                 f"'{name}' is a remote MCP server but no auth header/token is configured. "
-                "41% of public MCP servers require no auth at all — anyone who reaches the URL can call your tools.",
+                "41% of public MCP servers require no auth at all, so anyone who reaches the URL can call your tools.",
                 "Add an Authorization/x-api-key header (from a secret manager or env var), and require auth server-side."))
         if url.startswith("http://"):
             findings.append(Finding(
@@ -222,6 +225,34 @@ def audit_server(name: str, srv: dict) -> list:
                 "Scope filesystem access to the specific project directory, not $HOME or /."))
             break
 
+    env = srv.get("env") or {}
+    for k, v in env.items():
+        ks, vs = str(k).upper(), str(v).strip().lower()
+        if (ks == "NODE_TLS_REJECT_UNAUTHORIZED" and vs in ("0", "false")) \
+           or (ks == "PYTHONHTTPSVERIFY" and vs in ("0", "false")) \
+           or (ks in ("SSL_VERIFY", "TLS_VERIFY", "CURL_INSECURE") and vs in ("0", "false", "no")):
+            findings.append(Finding(
+                "tls-verify-disabled", "HIGH", name, "TLS certificate verification disabled",
+                f"'{name}' sets {k}={v}, which turns off TLS certificate checks. Every https call it makes "
+                "can be silently intercepted (man in the middle).",
+                "Remove the override and fix the underlying certificate instead of disabling verification."))
+            break
+
+    surface = " ".join(args) + " " + str(srv.get("url") or "") + " " + " ".join(f"{x}" for x in env.values())
+    if re.search(r"(?:^|[^\d.])0\.0\.0\.0(?![\d.])", surface):
+        findings.append(Finding(
+            "bind-all-interfaces", "MEDIUM", name, "Server bound to all network interfaces",
+            f"'{name}' binds to 0.0.0.0, which exposes it on every network interface, not just localhost.",
+            "Bind to 127.0.0.1 for a local server, or put it behind an authenticated reverse proxy."))
+
+    argl = [a.lower() for a in args]
+    if runner == "sudo" or "--privileged" in argl or "--cap-add" in argl:
+        findings.append(Finding(
+            "privileged-runner", "MEDIUM", name, "Runs with elevated privileges",
+            f"'{name}' launches with elevated privileges (sudo or a privileged container). A prompt-injected "
+            "tool then runs with that power.",
+            "Run the server as an unprivileged user in a sandboxed container with no extra capabilities."))
+
     return findings
 
 
@@ -265,7 +296,7 @@ def audit_config(path: Path, tools_count: int | None = None) -> AuditResult:
         res.findings.append(Finding(
             "server-bloat", "LOW", "*", f"{len(servers)} MCP servers configured",
             f"~{res.est_tokens:,} tokens of tool definitions are loaded into every request before you type anything. "
-            "Five servers commonly cost 50–75k tokens of context.",
+            "Five servers commonly cost 50 to 75k tokens of context.",
             "Disable servers you aren't actively using; load niche servers on demand instead of always-on."))
 
     # Redundancy heuristic by capability keyword in server names

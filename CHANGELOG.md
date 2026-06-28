@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+- Three new checks: `tls-verify-disabled` (HIGH, catches NODE_TLS_REJECT_UNAUTHORIZED=0 and friends),
+  `bind-all-interfaces` (MEDIUM, a server listening on 0.0.0.0), and `privileged-runner` (MEDIUM, sudo or
+  a privileged container). Cleaned the last em-dashes out of the report text.
+
 ## 0.1.3
 - New `--by-risk` flag: groups findings by risk class (Authentication, Credentials & secrets, Network
   exposure, Code execution & supply chain, Over-broad access, Context cost) instead of severity. The

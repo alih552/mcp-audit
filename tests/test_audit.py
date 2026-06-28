@@ -75,6 +75,18 @@ class TestAudit(unittest.TestCase):
         self.assertIn("Authentication", classes)
         self.assertIn("Code execution & supply chain", classes)
 
+    def test_tls_verify_disabled(self):
+        ids = {f.id for f in audit_server("x", {"command": "node", "env": {"NODE_TLS_REJECT_UNAUTHORIZED": "0"}})}
+        self.assertIn("tls-verify-disabled", ids)
+
+    def test_bind_all_interfaces(self):
+        ids = {f.id for f in audit_server("x", {"command": "node", "args": ["server.js", "--host", "0.0.0.0"]})}
+        self.assertIn("bind-all-interfaces", ids)
+
+    def test_privileged_runner(self):
+        ids = {f.id for f in audit_server("x", {"command": "sudo", "args": ["node", "server.js"]})}
+        self.assertIn("privileged-runner", ids)
+
 
 if __name__ == "__main__":
     unittest.main()
