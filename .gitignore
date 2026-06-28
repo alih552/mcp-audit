@@ -6,3 +6,8 @@ dist/
 .venv/
 .pytest_cache/
 .DS_Store
+LAUNCH.md
+x-thread.md
+dev-to-post*.md
+reddit-posts.md
+product-hunt.md
