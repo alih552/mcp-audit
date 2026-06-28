@@ -87,7 +87,7 @@ MCP server starter** — bearer + JWT auth, rate limiting, SSRF-safe outbound fe
 token-lean tool schemas, 21 tests, CI, and Docker/Node deploy configs, with a security checklist and
 setup guide. Ship a server that scores **A** from day one.
 
-> 🚀 **Launching on Polar shortly — ⭐ star/watch this repo for the link.**
+> 🚀 **[Get MCP Forge Kit →](https://alih552.github.io/mcp-forge/)** — €39, one-time, secure checkout via Polar.
 
 ## License
 MIT.
