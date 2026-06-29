@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.6
+- Two new checks: `curl-pipe-shell` (HIGH, a remote download piped into a shell) and `insecure-http-proxy` (MEDIUM, traffic routed through a cleartext http proxy).
+
 ## 0.1.5
 - New `--sarif` output (SARIF 2.1.0) so mcp-audit drops straight into GitHub code scanning and CI.
 

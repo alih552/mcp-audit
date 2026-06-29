@@ -35,6 +35,8 @@ RISK_CLASS = {
     "inline-code-exec": "Code execution & supply chain",
     "shell-exec": "Code execution & supply chain",
     "privileged-runner": "Code execution & supply chain",
+    "curl-pipe-shell": "Code execution & supply chain",
+    "insecure-http-proxy": "Network exposure",
     "broad-filesystem": "Over-broad access",
     "server-bloat": "Context cost",
     "redundant-servers": "Context cost",
@@ -252,6 +254,20 @@ def audit_server(name: str, srv: dict) -> list:
             f"'{name}' launches with elevated privileges (sudo or a privileged container). A prompt-injected "
             "tool then runs with that power.",
             "Run the server as an unprivileged user in a sandboxed container with no extra capabilities."))
+
+    if re.search(r"(?:curl|wget|iwr|invoke-webrequest)\b.*\|\s*(?:sh|bash|zsh|iex|python)", (cmd + " " + " ".join(args)).lower()):
+        findings.append(Finding(
+            "curl-pipe-shell", "HIGH", name, "Pipes a download straight into a shell",
+            f"'{name}' fetches a remote script and pipes it into a shell. Whoever controls that URL runs code on your machine.",
+            "Download, pin, and review the script first. Never pipe a remote download into sh or bash."))
+
+    for pk, pv in env.items():
+        if str(pk).upper() in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY") and str(pv).lower().startswith("http://"):
+            findings.append(Finding(
+                "insecure-http-proxy", "MEDIUM", name, "Cleartext HTTP proxy",
+                f"'{name}' routes traffic through a cleartext http proxy ({pk}). The proxy can read and alter everything, including tokens.",
+                "Use an https proxy, or remove the proxy override."))
+            break
 
     return findings
 
