@@ -12,6 +12,7 @@ import json
 import sys
 from pathlib import Path
 
+from . import __version__
 from .audit import audit_config
 from .report import to_json, to_sarif, to_text
 
@@ -51,6 +52,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="mcp-audit", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("paths", nargs="*", help="MCP config file(s). Omit to auto-detect.")
+    p.add_argument("--version", action="version", version=f"mcp-audit {__version__}")
     p.add_argument("--json", action="store_true", help="output JSON")
     p.add_argument("--tools", help="a tool-list JSON export for accurate token estimates")
     p.add_argument("--no-color", action="store_true")
