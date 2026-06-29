@@ -9,6 +9,7 @@ description = "Find security holes and token bloat in your MCP server configs. Z
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
+authors = [{ name = "Ali Al-Jaafari" }]
 keywords = ["mcp", "model-context-protocol", "security", "audit", "claude", "llm", "tokens"]
 classifiers = [
   "Programming Language :: Python :: 3",
@@ -18,7 +19,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/REPLACE_ME/mcp-audit"
+Homepage = "https://github.com/alih552/mcp-audit"
+Repository = "https://github.com/alih552/mcp-audit"
+Issues = "https://github.com/alih552/mcp-audit/issues"
 
 [project.scripts]
 mcp-audit = "mcp_audit.cli:main"
